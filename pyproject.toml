@@ -22,15 +22,19 @@ dev = [
     "pytest-cov",
     "ruff",
 ]
-# CNeuroMod data layer (NeuralSet Study classes); not on PyPI yet.
-# neuralset/neuralfetch move fast (Meta FAIR): the bounds mark the range our
-# compat shim + drift tests (tests/test_compat.py) are verified against —
-# bump them only after those tests pass on the new version.
-# Downloading data additionally requires datalad + git-annex and S3 credentials.
+# CNeuroMod data layer (NeuralSet Study classes); not on PyPI yet. Marie's
+# active development happens on the marie_dev branch (main is a stale initial
+# commit), and marie_dev tracks the current neuralset/neuralfetch API.
+# The Meta FAIR stack moves fast: the bounds mark the range our drift tests
+# (tests/test_compat.py) are verified against — bump only after those pass.
+# Downloading data additionally requires git-annex and S3 credentials, and
+# constructing a Study clones its DataLad repos on first use.
 data = [
-    "neuralfetch-cneuromod @ git+https://github.com/courtois-neuromod/neuralfetch-cneuromod.git",
-    "neuralset>=0.2.2,<0.4",
-    "neuralfetch>=0.2.2,<0.4",
+    "neuralfetch-cneuromod @ git+https://github.com/courtois-neuromod/neuralfetch-cneuromod.git@marie_dev",
+    "neuralset>=0.3,<0.4",
+    "neuralfetch>=0.3,<0.4",
+    "datalad",  # hard import in neuralfetch-cneuromod (marie_dev)
+    "h5py",  # pre-extracted timeseries are HDF5
     "moviepy",  # required by neuralset's Video event type (movie datasets)
 ]
 
@@ -75,7 +79,7 @@ explicit_package_bases = true
 [[tool.mypy.overrides]]
 # Optional data-layer packages; not installed in the default CI environment,
 # and nibabel/pandas ship no type information.
-module = ["neuralfetch_cneuromod.*", "nibabel.*", "pandas.*", "numpy.*"]
+module = ["neuralfetch_cneuromod.*", "nibabel.*", "pandas.*", "numpy.*", "h5py.*", "datalad.*", "exca.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

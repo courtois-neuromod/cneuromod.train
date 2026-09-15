@@ -1,15 +1,27 @@
 """Explore the CNeuroMod movie10 dataset through its NeuralSet Study class.
 
 First step toward Milestone A1 (movie10 encoding baseline): download a
-subject's worth of events + preprocessed BOLD through the existing
-``neuralfetch-cneuromod`` Study class and summarize what it exposes.
+subject's worth of data through the ``neuralfetch-cneuromod`` (marie_dev)
+Movie10 Study class and summarize what it exposes.
+
+Notes on the data layer (verified 2026-09-16):
+
+* Constructing a Study datalad-clones its repos when the expected
+  subdirectories are missing — construction alone touches the network.
+* ``infra`` (exca cache backend) is required; pass a cache folder.
+* neuralset's ``run()`` rejects explicitly-set Study fields ("class
+  parameters"), so ``subjects=`` is only used for download/discovery here
+  and the events DataFrame is filtered afterwards.
+* Annotations are speech-to-text transcripts in the movie10.annotations
+  DataLad repo; pre-extracted timeseries (``--timeseries``) avoid raw BOLD.
 
 Usage (bash, with datalad and git-annex installed)::
 
     set -a; source .env; set +a    # AWS S3 credentials for annex content
     python scripts/explore_movie10.py --path data/cneuromod --subjects 01 --download
 
-Without ``--download`` the script only inspects data already on disk.
+Without ``--download`` the script only inspects data already on disk (but
+construction still clones the repo skeletons on first use).
 """
 
 from __future__ import annotations
@@ -17,8 +29,6 @@ from __future__ import annotations
 import argparse
 import logging
 from pathlib import Path
-
-from cneuromod.train.compat import patch_neuralfetch_cneuromod
 
 
 def main() -> None:
@@ -33,23 +43,40 @@ def main() -> None:
     parser.add_argument(
         "--download",
         action="store_true",
-        help="clone the DataLad repos and fetch events/BOLD content "
-        "(requires datalad, git-annex, and S3 credentials in the environment)",
+        help="fetch events/BOLD/stimuli/transcript content via DataLad "
+        "(requires git-annex and S3 credentials in the environment)",
     )
+    parser.add_argument(
+        "--timeseries",
+        default=None,
+        help="load pre-extracted timeseries instead of raw BOLD "
+        "(e.g. cneuromod2026, schaefer1000, voxel_mni)",
+    )
+    parser.add_argument("--cache", default=None, help="exca cache folder (default: {path}/.cache)")
     parser.add_argument("--datalad-jobs", type=int, default=4)
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
-    patch_neuralfetch_cneuromod()
+    from exca.steps.backends import Cached
     from neuralfetch_cneuromod.studies.movie10 import Movie10
 
     Path(args.path).mkdir(parents=True, exist_ok=True)
-    study = Movie10(path=args.path, subjects=args.subjects, datalad_jobs=args.datalad_jobs)
+    cache = Path(args.cache) if args.cache else Path(args.path) / ".cache"
+    cache.mkdir(parents=True, exist_ok=True)
+
+    study = Movie10(
+        path=args.path,
+        subjects=args.subjects,
+        infra=Cached(folder=cache),
+        datalad_jobs=args.datalad_jobs,
+        timeseries=args.timeseries,
+    )
     print(f"study        : {study.dataset_name}")
     print(f"bids dir     : {study.bids_dir}")
     print(f"fmriprep dir : {study.fmriprep_dir}")
-    print(f"space / res  : {study.space} / {study.resolution}")
+    print(f"movies       : {study.MOVIES}")
+    print(f"timeseries   : {study.timeseries}")
 
     if args.download:
         study.download()
@@ -66,19 +93,12 @@ def main() -> None:
     if len(timelines) > 10:
         print(f"    ... and {len(timelines) - 10} more")
     if not timelines:
-        print(
-            "Directories exist but contain no matching BOLD runs.\n"
-            "NOTE: the raw movie10 repo names tasks per movie segment "
-            "(task-bourne01, ...), while this Study class searches for "
-            f"task-{study.TASK}; if the fMRIPrep derivatives follow the same "
-            "naming, nothing will ever match — check with the data-layer "
-            "maintainers."
-        )
+        print("Directories exist but contain no matching BOLD runs — download first.")
         return
 
-    # neuralset's run() rejects any explicitly-set field ("class parameters"),
-    # so it needs a separate all-default instance; filter the result instead.
-    events = Movie10(path=args.path).run()
+    # run() needs an all-default instance (neuralset rejects set fields);
+    # filter the result to the requested subjects instead.
+    events = Movie10(path=args.path, infra=Cached(folder=cache)).run()
     events = events[events["subject"].isin([f"Movie10/{s}" for s in args.subjects])]
     print("\nevents DataFrame:")
     print(f"  shape   : {events.shape}")

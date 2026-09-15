@@ -26,12 +26,12 @@ class _LegacyInfraShim:
 
 
 def patch_neuralfetch_cneuromod() -> None:
-    """Make ``neuralfetch-cneuromod`` 0.1.0 usable with neuralset >= 0.2.
+    """Make ``neuralfetch-cneuromod``'s stale *main* branch importable.
 
-    Idempotent. Call before instantiating any ``CNeuroModStudy`` subclass.
-    Remove once ``CNeuroModStudy.model_post_init`` is updated upstream
-    (https://github.com/courtois-neuromod/neuralfetch-cneuromod) for the
-    current neuralset ``Study`` API.
+    Only the ``main`` branch needs this (it targets neuralset <= 0.2.2, whose
+    ``infra_timelines`` field was renamed in 0.2.3); the actively developed
+    ``marie_dev`` branch — which the ``[data]`` extra installs — already uses
+    the current API, and the patch is a harmless no-op there. Idempotent.
     """
     import neuralfetch_cneuromod.base as base
 
