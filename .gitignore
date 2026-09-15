@@ -1,4 +1,4 @@
-# Local planning documents (kept out of the public repository)
+# Local planning documents
 AGENTS.md
 cneuromod.train.md
 
@@ -40,7 +40,7 @@ Thumbs.db
 .env
 .env.*
 
-# Research data and artifacts (never commit data, checkpoints, or outputs)
+# Research data and artifacts
 data/
 checkpoints/
 outputs/
