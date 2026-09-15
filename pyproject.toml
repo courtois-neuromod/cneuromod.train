@@ -22,6 +22,11 @@ dev = [
     "pytest-cov",
     "ruff",
 ]
+# CNeuroMod data layer (NeuralSet Study classes); not on PyPI yet.
+# Downloading data additionally requires datalad + git-annex and S3 credentials.
+data = [
+    "neuralfetch-cneuromod @ git+https://github.com/courtois-neuromod/neuralfetch-cneuromod.git",
+]
 
 [project.urls]
 Homepage = "https://github.com/courtois-neuromod/cneuromod.train"
@@ -30,6 +35,11 @@ Issues = "https://github.com/courtois-neuromod/cneuromod.train/issues"
 
 [tool.hatch.version]
 path = "src/cneuromod/train/__init__.py"
+
+[tool.hatch.metadata]
+# The `data` extra points at a GitHub repo (neuralfetch-cneuromod is not on
+# PyPI yet). Direct references are fine as long as we don't publish to PyPI.
+allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cneuromod"]
@@ -52,9 +62,14 @@ select = [
 
 [tool.mypy]
 strict = true
-files = ["src", "tests"]
+files = ["src", "tests", "scripts"]
 mypy_path = "src"
 explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+# Optional data-layer packages; not installed in the default CI environment.
+module = ["neuralfetch_cneuromod.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
