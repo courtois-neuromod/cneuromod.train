@@ -23,9 +23,15 @@ dev = [
     "ruff",
 ]
 # CNeuroMod data layer (NeuralSet Study classes); not on PyPI yet.
+# neuralset/neuralfetch move fast (Meta FAIR): the bounds mark the range our
+# compat shim + drift tests (tests/test_compat.py) are verified against —
+# bump them only after those tests pass on the new version.
 # Downloading data additionally requires datalad + git-annex and S3 credentials.
 data = [
     "neuralfetch-cneuromod @ git+https://github.com/courtois-neuromod/neuralfetch-cneuromod.git",
+    "neuralset>=0.2.2,<0.4",
+    "neuralfetch>=0.2.2,<0.4",
+    "moviepy",  # required by neuralset's Video event type (movie datasets)
 ]
 
 [project.urls]
@@ -67,8 +73,9 @@ mypy_path = "src"
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]
-# Optional data-layer packages; not installed in the default CI environment.
-module = ["neuralfetch_cneuromod.*"]
+# Optional data-layer packages; not installed in the default CI environment,
+# and nibabel/pandas ship no type information.
+module = ["neuralfetch_cneuromod.*", "nibabel.*", "pandas.*", "numpy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

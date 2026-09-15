@@ -66,10 +66,20 @@ def main() -> None:
     if len(timelines) > 10:
         print(f"    ... and {len(timelines) - 10} more")
     if not timelines:
-        print("Directories exist but contain no matching BOLD runs.")
+        print(
+            "Directories exist but contain no matching BOLD runs.\n"
+            "NOTE: the raw movie10 repo names tasks per movie segment "
+            "(task-bourne01, ...), while this Study class searches for "
+            f"task-{study.TASK}; if the fMRIPrep derivatives follow the same "
+            "naming, nothing will ever match — check with the data-layer "
+            "maintainers."
+        )
         return
 
-    events = study.run()
+    # neuralset's run() rejects any explicitly-set field ("class parameters"),
+    # so it needs a separate all-default instance; filter the result instead.
+    events = Movie10(path=args.path).run()
+    events = events[events["subject"].isin([f"Movie10/{s}" for s in args.subjects])]
     print("\nevents DataFrame:")
     print(f"  shape   : {events.shape}")
     print(f"  columns : {list(events.columns)}")
