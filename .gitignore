@@ -1,6 +1,7 @@
 # Local planning documents (kept out of the public repository)
 AGENTS.md
 cneuromod.train.md
+MEETINGS.md
 
 # Byte-compiled / cache
 __pycache__/
@@ -50,3 +51,6 @@ outputs/
 *.h5
 *.nii
 *.nii.gz
+
+# WSL virtual environment
+.venv-wsl/
