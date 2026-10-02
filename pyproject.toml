@@ -22,18 +22,21 @@ dev = [
     "pytest-cov",
     "ruff",
 ]
-# CNeuroMod data layer (NeuralSet Study classes); not on PyPI yet. Marie's
-# active development happens on the marie_dev branch (main is a stale initial
-# commit), and marie_dev tracks the current neuralset/neuralfetch API.
+# CNeuroMod data layer (NeuralSet Study classes); not on PyPI yet. The former
+# marie_dev development branch was merged into main (2026-10-01); per the
+# maintainer we pin that merge commit until releases/tags exist. Working Study
+# classes at this commit: movie10, friends, petit-prince, harry-potter, and
+# the videogame sets (shinobi, mario, mariostars, mario3); other classes in
+# the repo are unverified and may not work. Bump the pin deliberately.
 # The Meta FAIR stack moves fast: the bounds mark the range our drift tests
 # (tests/test_compat.py) are verified against — bump only after those pass.
 # Downloading data additionally requires git-annex and S3 credentials, and
 # constructing a Study clones its DataLad repos on first use.
 data = [
-    "neuralfetch-cneuromod @ git+https://github.com/courtois-neuromod/neuralfetch-cneuromod.git@marie_dev",
+    "neuralfetch-cneuromod @ git+https://github.com/courtois-neuromod/neuralfetch-cneuromod.git@74bb11c64ba3061f6c5cd911b20cdc72c9ed97bc",
     "neuralset>=0.3,<0.4",
     "neuralfetch>=0.3,<0.4",
-    "datalad",  # hard import in neuralfetch-cneuromod (marie_dev)
+    "datalad",  # hard import in neuralfetch-cneuromod
     "h5py",  # pre-extracted timeseries are HDF5
     "moviepy",  # required by neuralset's Video event type (movie datasets)
 ]

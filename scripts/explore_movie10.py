@@ -1,8 +1,8 @@
 """Explore the CNeuroMod movie10 dataset through its NeuralSet Study class.
 
 First step toward Milestone A1 (movie10 encoding baseline): download a
-subject's worth of data through the ``neuralfetch-cneuromod`` (marie_dev)
-Movie10 Study class and summarize what it exposes.
+subject's worth of data through the ``neuralfetch-cneuromod`` Movie10
+Study class and summarize what it exposes.
 
 Notes on the data layer (verified 2026-09-16):
 

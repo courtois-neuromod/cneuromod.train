@@ -26,12 +26,13 @@ class _LegacyInfraShim:
 
 
 def patch_neuralfetch_cneuromod() -> None:
-    """Make ``neuralfetch-cneuromod``'s stale *main* branch importable.
+    """Make pre-merge ``neuralfetch-cneuromod`` installs importable.
 
-    Only the ``main`` branch needs this (it targets neuralset <= 0.2.2, whose
-    ``infra_timelines`` field was renamed in 0.2.3); the actively developed
-    ``marie_dev`` branch — which the ``[data]`` extra installs — already uses
-    the current API, and the patch is a harmless no-op there. Idempotent.
+    Only the pre-2026-10 stale ``main`` needed this (it targeted neuralset
+    <= 0.2.2, whose ``infra_timelines`` field was renamed in 0.2.3). The
+    merged ``main`` — whose commit the ``[data]`` extra now pins — uses the
+    current API, making the patch a harmless idempotent no-op; it can be
+    removed once we trust there are no pre-merge installs left.
     """
     import neuralfetch_cneuromod.base as base
 

@@ -1,4 +1,4 @@
-"""Data-layer drift detection against neuralfetch-cneuromod (marie_dev).
+"""Data-layer drift detection against the pinned neuralfetch-cneuromod commit.
 
 Skipped automatically when the optional ``[data]`` extra is not installed
 (e.g. in the default CI environment). Run locally before bumping any
