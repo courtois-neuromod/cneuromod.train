@@ -12,7 +12,13 @@ authors = [
     { name = "Courtois NeuroMod" },
 ]
 requires-python = ">=3.11"
-dependencies = []
+# Core runtime: the encoding baseline reads parcel timeseries (h5py), builds
+# features (numpy), and fits ridge models (scikit-learn).
+dependencies = [
+    "h5py",
+    "numpy",
+    "scikit-learn",
+]
 dynamic = ["version"]
 
 [project.optional-dependencies]
@@ -37,7 +43,6 @@ data = [
     "neuralset>=0.3,<0.4",
     "neuralfetch>=0.3,<0.4",
     "datalad",  # hard import in neuralfetch-cneuromod
-    "h5py",  # pre-extracted timeseries are HDF5
     "moviepy",  # required by neuralset's Video event type (movie datasets)
 ]
 
@@ -82,7 +87,16 @@ explicit_package_bases = true
 [[tool.mypy.overrides]]
 # Optional data-layer packages; not installed in the default CI environment,
 # and nibabel/pandas ship no type information.
-module = ["neuralfetch_cneuromod.*", "nibabel.*", "pandas.*", "numpy.*", "h5py.*", "datalad.*", "exca.*"]
+module = [
+    "neuralfetch_cneuromod.*",
+    "nibabel.*",
+    "pandas.*",
+    "numpy.*",
+    "h5py.*",
+    "datalad.*",
+    "exca.*",
+    "sklearn.*",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
