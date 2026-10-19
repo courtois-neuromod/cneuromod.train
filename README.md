@@ -74,6 +74,7 @@ Run the same checks CI runs:
 
 ```bash
 ruff check . && ruff format --check . && mypy && pytest
+python -m build && twine check dist/*
 ```
 
 ## License

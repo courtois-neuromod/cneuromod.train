@@ -17,10 +17,12 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
+    "build",
     "mypy",
     "pytest",
     "pytest-cov",
     "ruff",
+    "twine",
 ]
 
 [project.urls]
